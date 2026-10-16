@@ -1,0 +1,5 @@
+# Build output (build.ps1)
+out/
+
+# Local test runs: data folders, screenshots, compiled test tools, helper scripts
+_tmp/

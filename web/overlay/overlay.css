@@ -1,0 +1,161 @@
+/* HuntXtract overlay. Every colour, font and size comes from the variables overlay.js sets.
+   Kept to what the older Chromium inside OBS understands (no color-mix, no :has). */
+.kg-ov {
+  --kg-scale: 1;
+  --kg-radius: 8;
+  --kg-gap: 1;
+  --kg-cols: 3;
+  position: relative;
+  display: inline-flex;
+  font-family: var(--kg-font-label);
+  font-size: calc(16px * var(--kg-scale));
+  line-height: 1.15;
+  color: var(--kg-text);
+  background: var(--kg-bg);
+  border-radius: calc(var(--kg-radius) * 1px * var(--kg-scale));
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-font-smoothing: antialiased;
+}
+
+.kg-ov > * { position: relative; }
+.kg-ov > .kg-img {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.kg-shadow { box-shadow: 0 0.3em 1.3em rgba(0, 0, 0, 0.4); }
+.kg-tshadow { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.65); }
+
+/* Borders */
+.kg-b-top::before,
+.kg-b-left::before,
+.kg-b-frame::before,
+.kg-b-double::before,
+.kg-b-double::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+}
+.kg-b-top::before { left: 0; right: 0; top: 0; height: 0.14em; background: linear-gradient(90deg, var(--kg-accent), rgba(0, 0, 0, 0) 85%); }
+.kg-b-left::before { left: 0; top: 0; bottom: 0; width: 0.22em; background: var(--kg-accent); }
+.kg-b-frame::before { top: 0; right: 0; bottom: 0; left: 0; border: 1px solid var(--kg-accent-line); border-radius: inherit; }
+/* Hunt style: a thin outer line and a second one just inside it. */
+.kg-b-double::before { top: 0; right: 0; bottom: 0; left: 0; border: 1px solid var(--kg-accent-line); border-radius: inherit; }
+.kg-b-double::after { top: 0.24em; right: 0.24em; bottom: 0.24em; left: 0.24em; border: 1px solid var(--kg-line); }
+
+/* Text */
+.kg-title {
+  font-family: var(--kg-font-title);
+  font-weight: var(--kg-w-title);
+  font-size: 1.05em;
+  color: var(--kg-accent);
+  letter-spacing: 0.03em;
+}
+.kg-caps .kg-title { font-size: 1.22em; font-variant-caps: all-small-caps; letter-spacing: 0.07em; }
+
+.kg-items { display: flex; }
+.kg-item { display: flex; flex-direction: column; gap: 0.12em; }
+
+.kg-label {
+  font-size: 0.6em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--kg-label);
+}
+.kg-caps .kg-label { font-size: 0.8em; text-transform: none; font-variant-caps: all-small-caps; letter-spacing: 0.08em; }
+
+.kg-value {
+  font-family: var(--kg-font-value);
+  font-weight: var(--kg-w-value);
+  font-size: 1.55em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--kg-text);
+  transform-origin: left center;
+}
+
+.kg-sub {
+  font-size: 0.64em;
+  color: var(--kg-label);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.kg-nosub .kg-sub { display: none; }
+
+.kg-l-bottom .kg-item .kg-label { order: 2; }
+.kg-l-bottom .kg-item .kg-sub { order: 3; }
+
+.kg-tone .kg-ok .kg-value { color: var(--kg-ok); }
+.kg-tone .kg-bad .kg-value { color: var(--kg-bad); }
+
+.kg-empty { font-size: 0.8em; color: var(--kg-label); }
+
+/* Bar: title on the left, values side by side. */
+.kg-bar { align-items: center; padding: 0.62em 1.1em 0.58em; }
+.kg-bar .kg-title {
+  margin-right: calc(1em * var(--kg-gap));
+  padding-right: calc(1em * var(--kg-gap));
+  border-right: 1px solid var(--kg-line);
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+.kg-bar .kg-items { gap: calc(1.35em * var(--kg-gap)); }
+.kg-bar.kg-b-left { padding-left: 1.35em; }
+.kg-bar.kg-b-double { padding: 0.8em 1.25em 0.75em; }
+
+/* Card: title on top, one value per row. */
+.kg-card { flex-direction: column; padding: 0.85em 1.1em 0.8em; min-width: 13em; }
+.kg-card .kg-title { margin-bottom: calc(0.55em * var(--kg-gap)); }
+.kg-card .kg-items { flex-direction: column; gap: calc(0.42em * var(--kg-gap)); }
+.kg-card .kg-item { display: grid; grid-template-columns: 1fr auto; column-gap: 1.6em; align-items: baseline; }
+.kg-card .kg-value { font-size: 1.2em; grid-column: 2; grid-row: 1; transform-origin: right center; text-align: right; }
+.kg-card .kg-label { grid-column: 1; grid-row: 1; }
+.kg-card .kg-sub { grid-column: 2; grid-row: 2; text-align: right; }
+.kg-card.kg-b-left { padding-left: 1.35em; }
+.kg-card.kg-b-double { padding: 1.05em 1.3em 1em; }
+
+/* Grid: title on top, the values in columns. */
+.kg-grid { flex-direction: column; padding: 0.85em 1.1em 0.8em; }
+.kg-grid .kg-title { margin-bottom: calc(0.6em * var(--kg-gap)); }
+.kg-grid .kg-items {
+  display: grid;
+  grid-template-columns: repeat(var(--kg-cols), auto);
+  gap: calc(0.75em * var(--kg-gap)) calc(1.5em * var(--kg-gap));
+}
+.kg-grid.kg-b-left { padding-left: 1.35em; }
+.kg-grid.kg-b-double { padding: 1.05em 1.3em 1em; }
+
+/* Line: everything in one line, like a ticker. */
+.kg-line { align-items: baseline; padding: 0.45em 0.95em; }
+.kg-line .kg-title { margin-right: calc(0.9em * var(--kg-gap)); }
+.kg-line .kg-items { align-items: baseline; gap: calc(0.55em * var(--kg-gap)); }
+.kg-line .kg-item { flex-direction: row; align-items: baseline; gap: 0.35em; }
+.kg-line .kg-item + .kg-item::before { content: "·"; color: var(--kg-accent); margin-right: calc(0.55em * var(--kg-gap)); }
+.kg-line .kg-value { font-size: 1.1em; }
+.kg-line .kg-sub { display: none; }
+.kg-line.kg-l-bottom .kg-item .kg-label { order: 2; }
+.kg-line.kg-b-left { padding-left: 1.2em; }
+.kg-line.kg-b-double { padding: 0.62em 1.1em; }
+
+/* Alignment of label and value inside each value */
+.kg-a-center .kg-item { align-items: center; text-align: center; }
+.kg-a-right .kg-item { align-items: flex-end; text-align: right; }
+.kg-a-center .kg-value { transform-origin: center; }
+.kg-a-right .kg-value { transform-origin: right center; }
+.kg-card.kg-a-center .kg-title, .kg-grid.kg-a-center .kg-title { text-align: center; }
+.kg-card.kg-a-right .kg-title, .kg-grid.kg-a-right .kg-title { text-align: right; }
+.kg-grid.kg-a-center .kg-items { justify-items: center; }
+.kg-grid.kg-a-right .kg-items { justify-items: end; }
+
+.kg-anim .kg-changed .kg-value { animation: kg-flash 1.6s ease-out; }
+
+@keyframes kg-flash {
+  0% { color: var(--kg-accent); transform: scale(1.14); }
+  35% { color: var(--kg-accent); transform: scale(1); }
+  100% { transform: scale(1); }
+}

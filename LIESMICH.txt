@@ -1,0 +1,248 @@
+HuntXtract – Match-Tracker für Hunt: Showdown
+===============================================
+by Chris aka BliZzi1337 · Steam: https://steamcommunity.com/id/blizzi1337/
+
+(English version: README.txt)
+
+Was es macht
+------------
+HuntXtract liest nach jedem Match die Mission Summary aus – direkt vom Bildschirm oder aus
+deiner OBS-Spielaufnahme (Bounty Collected, Monsters Killed, Hunters Killed, Bounty Token,
+Hunter Progress, Hunt Dollars … – oder was du markierst), speichert die Werte und zeigt
+Tages-, Verlaufs-, Karten- und Gesamtstatistiken. Für den Stream gibt es frei gestaltbare
+Overlays, für das Programm mehrere Designs. Kein Eingriff ins Spiel, alle Daten bleiben auf
+deinem PC.
+
+
+Installation
+------------
+1. Den Ordner "HuntXtract" an einen festen Ort kopieren, z. B. C:\Portable Stuff\HuntXtract
+   (nicht zu tief verschachteln, sonst landen die Daten unter %LOCALAPPDATA%\HuntXtract).
+2. HuntXtract.exe starten. Nötig ist nur Windows 10/11 mit der Edge-WebView2-Runtime
+   (bei Windows 11 immer dabei). OBS (ab Version 28) brauchst du nur für die OBS-Variante
+   und für das Stream-Overlay.
+
+
+Einrichtung (einmalig)
+----------------------
+Beim ersten Start führt dich eine kurze Tour durch alle Schritte – ganz am Anfang wählst
+du die Sprache (Englisch oder Deutsch; später unter Einstellungen -> Programm -> Sprache).
+Brauchst du die Tour nicht, hak "Ich brauche keine Hilfe" an – dann kommt sie nicht wieder.
+Später startest du sie unter Einstellungen -> Einführung jederzeit neu.
+
+Spielst du Hunt in 16:9 ab 1920 × 1080 (Full HD, 2K, 4K) auf Englisch oder Deutsch, ist
+schon alles eingerichtet: HuntXtract erkennt das beim ersten Start (Auflösung und
+Fenstermodus aus Hunts game.cfg, die Sprache aus Hunts Protokoll) und übernimmt eine
+fertige Einrichtung – die Rahmen für Mission Summary, Team Details und Karte samt
+Beispielbildern. Hunt zeichnet seine Menüs in jeder 16:9-Auflösung an dieselben Stellen,
+daher passt sie überall. Du wählst nur noch die Bildquelle (Schritt 1) und kannst gleich
+spielen. Sitzt bei dir ein Rahmen nicht, verschieb ihn und speichere – ab dann ist es
+deine eigene Einrichtung. Die Vorgabe lädst du jederzeit mit "Fertige Einrichtung laden"
+in Schritt 6 (ersetzt deine Rahmen und Bilder, deine Matches bleiben). Für andere
+Seitenverhältnisse oder Spielsprachen gehst du die Schritte unten einmal durch.
+
+1. Bildquelle wählen (Schritt 1). Voreingestellt ist "Bildschirm direkt". Zwei Wege:
+   a) Über OBS: dort Werkzeuge -> WebSocket-Servereinstellungen -> "WebSocket-Server
+      aktivieren", Passwort über "Verbindungsinformationen anzeigen" kopieren.
+   b) Bildschirm direkt: ohne OBS, HuntXtract liest selbst von einem Monitor. Dafür sollte
+      Hunt im randlosen Fenster laufen – im exklusiven Vollbild bleibt das Bild oft schwarz.
+      Aufgenommen wird dabei nur Hunts Fenster und nur, solange Hunt im Vordergrund ist.
+      Ist ein anderes Programm vorne, bleibt das Bild schwarz und oben steht "Hunt nicht im
+      Vordergrund" – dein Desktop und andere Programme werden nie gelesen.
+2. HuntXtract -> Einrichtung, Schritt 1: bei OBS Adresse 127.0.0.1, Port 4455 und Passwort
+   eintragen, "Verbinden & Quellen laden", deine Hunt-Spielaufnahme wählen, "Übernehmen".
+   Beim Bildschirm musst du nichts wählen – HuntXtract nimmt den Monitor, auf dem Hunt läuft.
+3. In Hunt nach einem Match die Mission Summary öffnen und warten, bis alle Zahlen
+   stehen. Dann "Jetzt aufnehmen" (oder "In 5 Sekunden aufnehmen" und zurück ins Spiel).
+   Bei "Bildschirm direkt" wartet "Jetzt aufnehmen", bis du zurück im Spiel bist.
+4. Felder markieren: zuerst "Wiedererkennung" – am besten die Überschrift
+   "Mission Summary". Dann für jeden Wert einen Rahmen um die Zahl ziehen (ohne die
+   Beschriftung daneben). Der Zoom hilft dabei. "Beispiel ansehen" zeigt eine fertige
+   Einrichtung – so ungefähr gehören die Rahmen hin.
+   Felder kannst du umbenennen, entfernen oder eigene hinzufügen. Die Art daneben sagt,
+   wie gezählt wird: "Zahl" wird zusammengezählt (Kills, Bounty), "Stand" nicht – dort
+   zählt nur der neueste Wert, passend für das Hunter Level.
+5. Team Details (freiwillig): In Hunt auf den Reiter "Team Details" wechseln, aufnehmen und
+   dort die Namen deiner Mitspieler, deren MMR-Sterne und die Match-MMR markieren. Für
+   Sterne die Feld-Art "Sterne" nehmen und den Rahmen nur um die Sternenreihe ziehen.
+   Trag oben deinen Hunt-Namen ein: HuntXtract sucht die Zeile mit diesem Namen und schreibt
+   deren Sterne als "Eigene MMR" mit. Ist das Feld leer, nimmt HuntXtract von selbst deinen
+   Steam-Namen (den zeigt Hunt). Wechselst du nach einem Match dorthin, ergänzt
+   HuntXtract die Werte beim selben Match.
+6. Karte (freiwillig, Schritt 5): Öffne zu Rundenbeginn, vor dem ersten Clue, mit Tab die
+   Karte – ohne zu zoomen – und nimm sie auf, am einfachsten mit "In 5 Sekunden aufnehmen".
+   Die Rahmen für Legende, Kartenausschnitt und Kartennamen sind für 16:9-Bildschirme
+   schon gesetzt; "Karte testen" zeigt, ob dein gelber Punkt und der Kartenname erkannt
+   werden. Mehr unter "Laufspur".
+7. "Auslesen testen" – passen die Werte? Dann "Einrichtung speichern".
+   Die Wiedererkennungs-Anzeige sollte bei offener Mission Summary deutlich über der
+   Schwelle liegen und sonst deutlich darunter.
+
+
+Gut zu wissen
+-------------
+- Bei der OBS-Variante muss die Spielaufnahme in der aktiven OBS-Szene sichtbar sein,
+  sonst nimmt OBS das Spiel gar nicht auf. Streamen musst du dafür nicht.
+- Bei "Bildschirm direkt" braucht es gar kein OBS. Umschalten kannst du jederzeit in
+  Schritt 1; markierte Felder bleiben erhalten, solange die Auflösung gleich bleibt.
+- Solange die Einrichtungsseite offen ist, wird nichts gespeichert (oben steht dann
+  "Pausiert – Einrichtung offen"). Zum Zählen einfach zur Übersicht wechseln.
+- Nach dem Match die Mission Summary offen lassen, bis alle Punkte vergeben sind:
+  HuntXtract wartet mindestens 12 Sekunden und liest aus, sobald 3 Sekunden lang nichts
+  mehr hochzählt – dann kommt der Ton. Schließt du sie früher, speichert es den letzten
+  sichtbaren Stand mit dem Hinweis "bitte Werte prüfen".
+- Währenddessen zeigt ein kleines Fenster oben über dem Spiel den Countdown
+  ("Auslesen in 9 s") und danach "Match #… gespeichert". Man kann durch das Fenster
+  hindurchklicken, es nimmt dem Spiel nicht den Fokus und erscheint nicht im Stream.
+  Position und An/Aus: Einstellungen -> Anzeige im Spiel. Falls es im Spiel nicht zu
+  sehen ist: Hunt im randlosen Fenstermodus statt im exklusiven Vollbild laufen lassen.
+- Extracted oder Died steht so nicht in der Mission Summary. HuntXtract kann es aber selbst
+  erkennen: Hak in der Einrichtung bei Feldern, die es nur bei einem überlebenden Hunter
+  gibt (Hunter Level, Hunter Progress), "nur bei Extracted" an. Ist keins davon lesbar,
+  trägt HuntXtract "Died" ein, sonst "Extracted". Korrigieren geht immer mit einem Klick
+  auf den Ausgang – in der Übersicht beim letzten Match oder in der Match-Liste.
+- Hunter Level 50: Beim höchsten Level zeigt die Mission Summary statt der Zahl ein Symbol.
+  HuntXtract erkennt das und trägt 50 ein (bei Feldern, deren Name "Level" enthält).
+- Eigene MMR nachträglich: Trägst du deinen Hunt-Namen erst später ein (oder änderst ihn),
+  ergänzt HuntXtract die eigene MMR bei allen bisherigen Matches mit Team Details, bei
+  denen sie noch fehlt.
+- Match verpasst? Strg+Alt+K (in den Einstellungen änderbar) oder "Jetzt auslesen"
+  liest den aktuellen Bildschirm sofort aus – auch während Hunt im Vordergrund ist.
+  Stehst du dabei auf "Team Details", ergänzt HuntXtract stattdessen diese Werte beim
+  letzten Match. So kannst du ein Match auch nachträglich vervollständigen. Bei
+  "Bildschirm direkt" wartet "Jetzt auslesen" im Programm bis zu 15 Sekunden, bis Hunt
+  wieder im Vordergrund ist. Wechselst du während des Countdowns kurz aus dem Spiel,
+  wartet HuntXtract mit dem Auslesen, bis du zurück bist.
+- Kyrillische Mitspieler: Steht ein Mitspielername in kyrillischer Schrift, zeigt die
+  Match-Liste ein "kyrillisch" an und die Übersicht zählt, in wie vielen Matches das so
+  war. Dafür braucht Windows eine Texterkennung mit kyrillischer Schrift (Einstellungen ->
+  Zeit und Sprache -> Sprache hinzufügen -> Russisch, mit dem Feature "Texterkennung").
+  Ohne sie werden solche Namen unlesbar und damit auch nicht gezählt.
+- Karten: Die Übersicht zeigt, wie oft du welche Karte gespielt hast – heute, in den
+  letzten 30 Tagen oder insgesamt. Pro Karte siehst du den Anteil an deinen Matches, wie
+  oft du extrahiert hast, den Schnitt bei Hunters Killed und Bounty Collected und wann du
+  zuletzt dort warst. Das Bild ist die Karte aus deinem letzten Match dort. Die Karte kommt
+  aus Hunts eigenem Protokoll oder von der Laufspur – auch ohne einen Blick auf die Karte
+  (Tab). Matches ohne erkannte Karte zählen hier nicht mit.
+- Etwas falsch gelesen? Unter "Matches" das Match anklicken und korrigieren. Oben siehst du
+  den Screenshot der Mission Summary und – wenn gelesen – den der Team Details; mit den
+  Reitern oder den Pfeiltasten schaltest du zwischen beiden um.
+- Dieselbe Mission Summary wird nicht doppelt gezählt – auch nicht, wenn sie nach einem
+  Neustart von HuntXtract noch offen ist. War sie beim ersten Auslesen noch nicht fertig
+  (z. B. weil Hunt im Hintergrund war) und liest HuntXtract sie später vollständiger, ergänzt
+  es die fehlenden Werte beim selben Match. Löschst du ein Match, während die Summary noch
+  offen ist, kommt es nicht zurück (außer du liest per Hotkey oder "Jetzt auslesen" aus).
+- Ändert ein Hunt-Update die Mission Summary, einfach die Einrichtung neu machen.
+- Stellst du Hunt auf Englisch oder Deutsch um, erkennt HuntXtract die Seiten weiter von
+  selbst – solange die Wiedererkennung an den Stellen der fertigen Einrichtung liegt.
+
+
+Laufspur
+--------
+Ist die Karte eingerichtet (Einrichtung, Schritt 5), merkt sich HuntXtract bei jedem Blick
+auf die Tab-Karte, wo dein gelber Punkt gerade ist – höchstens einmal pro Sekunde. Wird die
+Mission Summary gespeichert, hängt die Spur an diesem Match: In der Match-Ansicht zeigt der
+Reiter "Laufspur" die Karte mit deinem Weg als laufende Ameisenspur (Ring = Start, Punkt =
+Ende: grün bei Extracted, rot bei Died), in der Match-Liste steht der Name der Karte.
+- Zwischen zwei Blicken auf die Karte wird die Spur gerade verbunden. Je öfter du Tab
+  drückst, desto genauer wird sie.
+- Gezählt wird nur die Karte, wie Hunt sie öffnet. Hast du hineingezoomt, wird dieser Blick
+  übersprungen. Zu Rundenbeginn erkennt HuntXtract das am roten Rand ringsum und merkt sich
+  dabei jede Karte einmal. So zählen auch die späteren Blicke, wenn die Clues den roten Rand
+  längst nach innen verschoben haben. Schau also einmal zu Rundenbeginn auf die Karte, vor
+  dem ersten Clue – für jede Karte nur ein einziges Mal.
+- Während des Matches zeigt die Übersicht die Spur live: die Karte vom letzten Blick mit
+  deinem Weg bis jetzt. Sie wächst bei jedem Blick auf die Karte.
+- Oben im Status steht, wie viele Punkte die Spur des laufenden Matches schon hat.
+- Fährst du in der Match-Ansicht (oder in der Live-Karte) über einen Punkt der Spur, zeigt
+  das Bild die Karte aus genau diesem Moment – mit deinen Teammates, wo sie da gerade waren.
+  Dafür hebt HuntXtract zu jedem Punkt ein kleines Kartenbild auf (etwa 40 KB).
+- Liegt das Steam-Overlay (Shift+Tab) über der Karte, zählt der Blick nicht – sonst könnte
+  ein Profilbild in der Freundesliste für deinen Punkt gehalten werden.
+- Startest du HuntXtract mitten im Match neu, geht die Spur nicht verloren.
+- Absturz oder Verbindungsabbruch? Dann kommt keine Mission Summary. Mit "Match abbrechen"
+  in der Karte "Laufendes Match" (Übersicht) wartet HuntXtract nicht länger auf dieses Match
+  und verwirft seine Spur; das nächste Match wird wie gewohnt erfasst. Schaust du im selben
+  Match doch wieder auf die Karte, wird es weiter verfolgt.
+
+
+Hunt-Status
+-----------
+HuntXtract liest mit, was Hunt selbst in sein Protokoll schreibt (Game.log im Unterordner
+USER des Hunt-Ordners, gefunden über Steam). Oben steht dann, wo du gerade bist: "Im Menü",
+"Im Match · Lawson Delta · 12 min", "Schießstand" oder "Mission Summary". Die Laufspur beginnt genau mit
+dem Match, und der Name der Karte kommt sicher aus dem Protokoll statt aus der
+Texterkennung. HuntXtract liest nur, ändert nichts und braucht kein Internet. Ohne
+Steam-Installation von Hunt fehlt die Anzeige einfach, der Rest läuft wie gehabt.
+
+
+Design
+------
+Einstellungen -> Design: sechs Designs für das ganze Programm – Hunt 1896, Blutmond, Bayou,
+Mitternacht, Pergament (hell) und Modern (das schlichte Design der ersten Version). Dazu
+ein Hintergrundbild aus dem offiziellen Hunt-Fankit, wie stark es durchscheint, die Schrift
+(voreingestellt ist Western; "Wie Design" nimmt die Schrift des Designs) und eine eigene
+Akzentfarbe. Titelleiste und Countdown-Fenster im Spiel folgen dem Design.
+
+
+Overlay für OBS
+---------------
+HuntXtract -> Overlay. Jedes Overlay hat eine eigene kurze Adresse
+(http://127.0.0.1:4466/overlay?o=…): kopieren und in OBS als Browser-Quelle einfügen.
+Die Vorschau zeigt, wie groß die Quelle mindestens sein sollte. HuntXtract muss laufen.
+Alles, was du danach im Programm änderst, übernimmt OBS nach etwa einer Sekunde von selbst –
+die Adresse bleibt gleich. Einstellbar ist:
+- Vorlage: Hunt 1896, Modern, Glas, Nur Schrift, Steckbrief, Blutmond, Bayou, Mitternacht
+  (setzt Farben, Schrift und Rahmen – deine Werte und die Anordnung bleiben)
+- Werte & Reihenfolge: Zeitraum, welche Werte, ihre Reihenfolge (am Griff ziehen) und
+  eigene Namen für jeden Wert, Titel automatisch, eigener oder keiner
+- Anordnung: Leiste, Karte, Raster (mit Spaltenzahl) oder eine Zeile, Ausrichtung,
+  Beschriftung über oder unter dem Wert, Größe und Abstände
+- Farben & Hintergrund: Hintergrundfarbe mit Deckkraft (0 % = ganz durchsichtig),
+  Hintergrundbild mit eigener Deckkraft, Farben für Werte, Beschriftung, Akzent,
+  Extracted und Died
+- Schrift & Rahmen: fünf Schriften, Rahmenart, Ecken, Schatten und Schriftschatten
+Mehrere Overlays gleichzeitig sind kein Problem, z. B. eine Leiste für "Heute" und eine
+Karte für das letzte Match. Alte Adressen mit "?scope=…" laufen weiter, übernehmen aber
+keine Änderungen – ersetz sie einmal durch die neue Adresse.
+
+
+Deine Daten
+-----------
+Alles liegt im Unterordner "Daten":
+  matches.json       deine Matches
+  Matches\           ein Ordner pro Tag, darin einer pro Match (z. B. "19-08 Match 34") mit
+                     stats.txt (alle Werte zum Nachlesen) und den Bildern: summary.jpg,
+                     team.jpg, karte.jpg und karte-001.jpg … (die Karte zu jedem Punkt der
+                     Laufspur). Bilder sind abschaltbar (Einstellungen -> Screenshots speichern).
+  sicherungen\       tägliche Kopie der Matches (die letzten 14 Tage)
+  geloescht.json     gelöschte Matches der letzten 24 Stunden (damit sie nicht zurückkommen)
+  kalibrierung.json  + referenz.png / referenz-team.png / referenz-karte.png: deine Einrichtung
+  laufspur.json      die Spur des Matches, das gerade läuft (+ laufspur-bilder\: die Karte
+                     zu jedem Punkt, bis das Match gespeichert ist)
+  kartenbilder.json  die gemerkten Karten (für die Laufspur)
+  laufspur-verworfen.jpg  der letzte Blick auf die Karte, der nicht zählte (zur Fehlersuche)
+  overlays.json      deine Overlays für OBS
+  settings.json      Einstellungen (das OBS-Passwort ist mit deinem Windows-Konto verschlüsselt)
+  protokoll.log      Protokoll, falls mal etwas nicht klappt
+Zum Umziehen einfach den ganzen Ordner mitnehmen. Unter "Matches" gibt es außerdem
+einen CSV-Export für Excel.
+
+Aufräumen: Einstellungen -> Daten -> "Matches aufbewahren" – alle, die letzten 30 oder 90
+Tage, das letzte Jahr oder die letzten 100 bis 1000 Matches. Ältere räumt HuntXtract beim
+Start und nach jedem Match auf, wahlweise nur die Bilder (Werte und Statistik bleiben) oder
+das ganze Match. Würde eine Änderung sofort etwas löschen, sagt HuntXtract vorher, wie viel,
+und fragt nach. Bilder aus der Zeit vor Version 1.6.0 zieht HuntXtract beim ersten Start
+einmal in die Ordner um (vorher legt es eine Sicherung der Matches an).
+
+
+Bilder und Schriften
+--------------------
+HuntXtract ist ein Fan-Projekt und nicht mit Crytek verbunden. Die Hintergrundbilder
+stammen aus dem offiziellen Hunt: Showdown Fankit von Crytek. Die Schriften sind frei
+unter der SIL Open Font License (Lizenztexte im Ordner "Lizenzen"):
+- Crimson Text – die Textschrift der offiziellen Hunt-Website
+- EB Garamond – eine freie Garamond, nah an den Titeln im Spiel
+- Rye – Western-Schrift für Steckbrief-Look
+Die Originalschriften des Spiels (u. a. Garamond Premier Pro, Latinaires Pro, GT Sectra)
+sind kommerziell lizenziert und dürfen nicht weitergegeben werden.

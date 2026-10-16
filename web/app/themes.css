@@ -1,0 +1,266 @@
+/* Designs of the program. html carries data-theme (colours) and data-font (lettering); the
+   preview tiles in the settings carry the same attributes, so every rule here works on any
+   element – that is why the tokens sit on [data-theme] and not only on :root. */
+
+/* ------------------------------------------------------------ Hunt 1896 (default) */
+:root, [data-theme="hunt"] {
+  --bg: #0a0908;
+  --sidebar: rgba(13, 11, 9, 0.84);
+  --topbar: rgba(10, 9, 8, 0.35);
+  --panel: rgba(22, 19, 16, 0.88);
+  --panel-2: #231e19;
+  --panel-3: #2d2620;
+  --border: rgba(222, 199, 158, 0.12);
+  --border-strong: rgba(222, 199, 158, 0.24);
+  --text: #ede5d6;
+  --muted: #aca190;
+  --faint: #7c7163;
+  --gold: #d4b06a;
+  --on-accent: #16110a;
+  --ok: #7fc48f;
+  --bad: #de6e58;
+  --warn: #e3b25a;
+  --info: #8fb2d6;
+  --radius: 5px;
+  --radius-sm: 4px;
+  --veil: linear-gradient(180deg, rgba(10, 9, 8, 0.5), rgba(10, 9, 8, 0.8) 55%, rgba(10, 9, 8, 0.92));
+  --bg-filter: blur(1.5px) saturate(0.8) brightness(0.85);
+  --dim: rgba(6, 5, 4, 0.72);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------ Blutmond */
+[data-theme="blutmond"] {
+  --bg: #0c0606;
+  --sidebar: rgba(17, 8, 8, 0.85);
+  --topbar: rgba(12, 6, 6, 0.35);
+  --panel: rgba(27, 13, 12, 0.88);
+  --panel-2: #2b1614;
+  --panel-3: #371c19;
+  --border: rgba(240, 140, 120, 0.13);
+  --border-strong: rgba(240, 140, 120, 0.26);
+  --text: #f3e4de;
+  --muted: #bca19a;
+  --faint: #86655f;
+  --gold: #e2683e;
+  --on-accent: #1a0806;
+  --ok: #86cc9c;
+  --bad: #ff5f6b;
+  --warn: #eab35c;
+  --info: #a7b5d6;
+  --radius: 5px;
+  --radius-sm: 4px;
+  --veil: linear-gradient(180deg, rgba(12, 6, 6, 0.45), rgba(12, 6, 6, 0.82) 55%, rgba(12, 6, 6, 0.93));
+  --bg-filter: blur(1.5px) saturate(0.95) brightness(0.8);
+  --dim: rgba(8, 3, 3, 0.72);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------ Bayou */
+[data-theme="bayou"] {
+  --bg: #080d0a;
+  --sidebar: rgba(10, 16, 12, 0.85);
+  --topbar: rgba(8, 13, 10, 0.35);
+  --panel: rgba(15, 23, 18, 0.88);
+  --panel-2: #1a271f;
+  --panel-3: #233229;
+  --border: rgba(175, 205, 160, 0.12);
+  --border-strong: rgba(175, 205, 160, 0.24);
+  --text: #e7ecdf;
+  --muted: #a1af99;
+  --faint: #6e7c69;
+  --gold: #c9b458;
+  --on-accent: #12140a;
+  --ok: #8fd4a0;
+  --bad: #e3806a;
+  --warn: #e2bb5a;
+  --info: #8fb9c9;
+  --radius: 6px;
+  --radius-sm: 5px;
+  --veil: linear-gradient(180deg, rgba(8, 13, 10, 0.45), rgba(8, 13, 10, 0.82) 55%, rgba(8, 13, 10, 0.93));
+  --bg-filter: blur(1.5px) saturate(0.75) brightness(0.8);
+  --dim: rgba(4, 7, 5, 0.72);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------ Mitternacht */
+[data-theme="nacht"] {
+  --bg: #070a0f;
+  --sidebar: rgba(9, 13, 20, 0.85);
+  --topbar: rgba(7, 10, 15, 0.35);
+  --panel: rgba(14, 19, 28, 0.88);
+  --panel-2: #172031;
+  --panel-3: #1f2a3e;
+  --border: rgba(160, 190, 230, 0.12);
+  --border-strong: rgba(160, 190, 230, 0.24);
+  --text: #e4ebf4;
+  --muted: #99a8bb;
+  --faint: #647387;
+  --gold: #9cc2ea;
+  --on-accent: #0b1422;
+  --ok: #7fd3aa;
+  --bad: #f28f8f;
+  --warn: #e8c070;
+  --info: #9cc2ea;
+  --radius: 9px;
+  --radius-sm: 7px;
+  --veil: linear-gradient(180deg, rgba(7, 10, 15, 0.4), rgba(7, 10, 15, 0.8) 55%, rgba(7, 10, 15, 0.92));
+  --bg-filter: blur(1.5px) saturate(0.85) brightness(0.9);
+  --dim: rgba(3, 5, 9, 0.72);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------ Pergament (light) */
+[data-theme="pergament"] {
+  --bg: #e8dec7;
+  --sidebar: rgba(224, 211, 182, 0.88);
+  --topbar: rgba(236, 227, 206, 0.45);
+  --panel: rgba(247, 240, 225, 0.9);
+  --panel-2: #efe5cf;
+  --panel-3: #e3d6b8;
+  --border: rgba(90, 62, 32, 0.17);
+  --border-strong: rgba(90, 62, 32, 0.32);
+  --text: #2b2017;
+  --muted: #6a5845;
+  --faint: #978469;
+  --gold: #8e3421;
+  --on-accent: #fbf4e6;
+  --ok: #2e7a45;
+  --bad: #a8321f;
+  --warn: #9a6a12;
+  --info: #2f5f8a;
+  --radius: 4px;
+  --radius-sm: 3px;
+  --veil: linear-gradient(180deg, rgba(232, 222, 199, 0.3), rgba(232, 222, 199, 0.65));
+  --bg-filter: saturate(0.9);
+  --dim: rgba(45, 32, 20, 0.45);
+  --shadow: 0 18px 50px rgba(70, 48, 24, 0.28);
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------ Modern (the first design) */
+[data-theme="modern"] {
+  --bg: #0e0c0a;
+  --sidebar: rgba(18, 16, 13, 0.92);
+  --topbar: rgba(14, 12, 10, 0.4);
+  --panel: rgba(24, 21, 18, 0.94);
+  --panel-2: #201c18;
+  --panel-3: #28231e;
+  --border: #2c2620;
+  --border-strong: #40372e;
+  --text: #ede6da;
+  --muted: #a3998b;
+  --faint: #6f675c;
+  --gold: #e2b25c;
+  --on-accent: #1b140a;
+  --ok: #6fc48d;
+  --bad: #e2705f;
+  --warn: #e9b44c;
+  --info: #7fb0e0;
+  --radius: 10px;
+  --radius-sm: 7px;
+  --veil: linear-gradient(180deg, rgba(14, 12, 10, 0.55), rgba(14, 12, 10, 0.88));
+  --bg-filter: blur(2px) saturate(0.8) brightness(0.85);
+  --dim: rgba(5, 4, 3, 0.72);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
+/* Colours derived from the ones above – declared on every design scope so they follow it. */
+:root, [data-theme] {
+  --gold-soft: color-mix(in srgb, var(--gold) 14%, transparent);
+  --gold-line: color-mix(in srgb, var(--gold) 42%, transparent);
+  --ok-soft: color-mix(in srgb, var(--ok) 15%, transparent);
+  --bad-soft: color-mix(in srgb, var(--bad) 15%, transparent);
+  --warn-soft: color-mix(in srgb, var(--warn) 16%, transparent);
+  --mono: "Cascadia Mono", Consolas, monospace;
+}
+
+/* ------------------------------------------------------------ lettering */
+/* Hunt: Crimson Text (the body font of huntshowdown.com), titles and numbers in Garamond,
+   small labels in real small caps – like the game's menus. */
+:root, [data-font="serif"] {
+  --font: "BL Crimson", Georgia, "Cambria", serif;
+  --display: "BL Garamond", Georgia, serif;
+  --num: "BL Garamond", Georgia, serif;
+  --display-weight: 600;
+  --num-weight: 600;
+}
+[data-font="modern"] {
+  --font: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --display: Georgia, "Cambria", serif;
+  --num: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --display-weight: 600;
+  --num-weight: 650;
+}
+[data-font="western"] {
+  --font: "BL Crimson", Georgia, "Cambria", serif;
+  --display: "BL Rye", Georgia, serif;
+  --num: "BL Rye", Georgia, serif;
+  --display-weight: 400;
+  --num-weight: 400;
+}
+
+/* Small labels: spaced capitals in the sans design, small caps in Garamond for the serif one. */
+[data-font="serif"] .card-head h3,
+[data-font="serif"] .stat-label,
+[data-font="serif"] .tier-label,
+[data-font="serif"] .kv3 .h,
+[data-font="serif"] .section-label,
+[data-font="serif"] .tour-step,
+[data-font="serif"] .hero-count .label,
+[data-font="serif"] .caps-label {
+  font-family: var(--display);
+  text-transform: none;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+}
+[data-font="serif"] .card-head h3 { font-size: 16.5px; }
+[data-font="serif"] .stat-label { font-size: 14px; letter-spacing: 0.045em; }
+[data-font="serif"] .tier-label { font-size: 14.5px; }
+[data-font="serif"] .kv3 .h { font-size: 14px; }
+[data-font="serif"] .section-label { font-size: 15px; }
+[data-font="serif"] .tour-step { font-size: 14px; }
+[data-font="serif"] .hero-count .label { font-size: 16px; }
+[data-font="serif"] .caps-label { font-size: 15px; }
+[data-font="serif"] .val .k {
+  font-family: var(--display);
+  text-transform: none;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.05em;
+  font-size: 13.5px;
+  line-height: 14px;
+  height: 28px;
+}
+[data-font="serif"] .brand-name { font-size: 21px; letter-spacing: 0.02em; }
+[data-font="serif"] .topbar h1 { font-size: 26px; }
+[data-font="serif"] h2 { font-size: 21px; }
+[data-font="western"] .brand-name { font-size: 17px; letter-spacing: 0.01em; }
+[data-font="western"] .topbar h1 { font-size: 22px; letter-spacing: 0.01em; }
+
+/* ------------------------------------------------------------ the picture behind everything */
+.backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: var(--bg); overflow: hidden; }
+.backdrop::before {
+  content: ""; position: absolute; inset: -24px;
+  background-image: var(--bg-image, none); background-size: cover; background-position: center;
+  opacity: var(--bg-strength, 0); filter: var(--bg-filter);
+  transition: opacity 0.25s;
+}
+.backdrop::after { content: ""; position: absolute; inset: 0; background: var(--veil); }
+
+/* A faint paper grain on the surfaces, tinted per design. */
+.card, .sidebar, .modal, .tour-card {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.045 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+[data-theme="pergament"] .card, [data-theme="pergament"] .sidebar, [data-theme="pergament"] .modal, [data-theme="pergament"] .tour-card {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.22  0 0 0 0 0.1  0 0 0 0.09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+[data-theme="modern"] .card, [data-theme="modern"] .sidebar, [data-theme="modern"] .modal, [data-theme="modern"] .tour-card { background-image: none; }
+
+/* Hunt 1896: a second hairline inside the cards, like the frames in the game's menus. */
+[data-theme="hunt"] .card:not(.stat):not(.hero) { outline: 1px solid rgba(222, 199, 158, 0.07); outline-offset: -5px; }
