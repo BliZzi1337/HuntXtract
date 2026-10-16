@@ -1,0 +1,11 @@
+name: Idea / Idee
+description: Suggest a feature or improvement / Neue Funktion oder Verbesserung vorschlagen
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea / Deine Idee
+      description: What should HuntXtract do, and why would it help you? / Was soll HuntXtract können und wobei hilft es dir?
+    validations:
+      required: true

@@ -1,0 +1,46 @@
+name: Bug report / Fehler melden
+description: Something doesn't work or a value was read wrong / Etwas funktioniert nicht oder ein Wert wurde falsch gelesen
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / Was ist passiert?
+      description: What did you expect, what happened instead? / Was hast du erwartet, was ist stattdessen passiert?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: HuntXtract version / Version
+      description: Shown at the bottom left of the sidebar / Steht unten links in der Seitenleiste
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: game-language
+    attributes:
+      label: Hunt language / Spielsprache
+      options:
+        - English
+        - Deutsch
+        - Other / Andere
+  - type: input
+    id: resolution
+    attributes:
+      label: Resolution and capture / Auflösung und Bildquelle
+      placeholder: "2560 × 1440, screen directly / Bildschirm direkt (or/oder OBS)"
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: >
+        If a value was read wrong, a screenshot of the Mission Summary helps a lot. Please hide other
+        players' names. / Wurde ein Wert falsch gelesen, hilft ein Screenshot der Mission Summary sehr.
+        Bitte Namen anderer Spieler unkenntlich machen.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log (optional) / Protokoll (optional)
+      description: 'The last lines of Daten\protokoll.log (Settings → "Log" button) / Die letzten Zeilen aus Daten\protokoll.log (Einstellungen → Knopf „Protokoll“)'
+      render: text

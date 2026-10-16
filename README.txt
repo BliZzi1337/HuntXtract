@@ -1,6 +1,8 @@
 HuntXtract – Match tracker for Hunt: Showdown
 =============================================
 by Chris aka BliZzi1337 · Steam: https://steamcommunity.com/id/blizzi1337/
+Twitch: https://www.twitch.tv/blizzi1337 · Discord: blizzi1337
+Bugs and ideas: https://github.com/BliZzi1337/HuntXtract/issues
 
 (Deutsche Anleitung: LIESMICH.txt)
 
