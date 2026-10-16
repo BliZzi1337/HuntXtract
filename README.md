@@ -1,6 +1,6 @@
 # HuntXtract – Match Tracker for Hunt: Showdown 1896
 
-![GitHub Release](https://img.shields.io/github/v/release/BliZzi1337/HuntXtract&label=version)
+![GitHub Release](https://img.shields.io/github/v/release/BliZzi1337/HuntXtract?label=version)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/BliZzi1337/HuntXtract/total)
 [![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=flat&logo=windows&logoColor=white)](https://github.com/BliZzi1337/HuntXtract/releases/latest)
 [![Hunt: Showdown 1896](https://img.shields.io/badge/Hunt%3A%20Showdown-1896-8b1a1a?style=flat)](https://www.huntshowdown.com/)
