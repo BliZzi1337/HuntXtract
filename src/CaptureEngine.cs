@@ -185,7 +185,8 @@ namespace Kopfgeld
         {
             var hunt = getHunt();
             if (hunt.MapName == null || hunt.MatchStarted == DateTime.MinValue) return null;
-            if (hunt.Phase != HuntPhase.Match && hunt.Phase != HuntPhase.Summary && hunt.Phase != HuntPhase.Menu) return null;
+            if (hunt.Phase != HuntPhase.Match && hunt.Phase != HuntPhase.Summary && hunt.Phase != HuntPhase.Menu
+                && hunt.Phase != HuntPhase.Searching && hunt.Phase != HuntPhase.Found) return null;
             double minutes = (DateTime.UtcNow - hunt.MatchStarted).TotalMinutes;
             return minutes >= 0 && minutes <= TrailRecorder.LongestMatchMinutes + 15 ? hunt.MapName : null;
         }

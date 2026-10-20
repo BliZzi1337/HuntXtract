@@ -29,7 +29,10 @@ It never touches the game: no injection, no memory reading, no internet needed. 
   Gulch, with extraction rate and averages per map.
 - **Trail on the map** – every look at the map (Tab) marks where you were; after the match you see
   your whole route, live during the match too.
-- **Hunt status** – reads Hunt's own log: menu, loading, in a match on which map, shooting range.
+- **Hunt status** – reads Hunt's own log: menu, matchmaking, loading, in a match on which map, shooting range.
+- **Matchmaking time** – a live clock for the search and the lobby wait ("Searching · 0:21",
+  "Lobby found · waiting 0:42"), Ø click-to-match, search and lobby times, lobbies that broke up,
+  by time of day – and as a live value for your OBS overlay.
 - **Ready-made setup** for 16:9 from 1920 × 1080 upwards (Full HD, 1440p, 4K) in English and German –
   new users usually don't have to draw a single frame.
 - **OBS overlays** for streamers – freely designable, as a browser source.

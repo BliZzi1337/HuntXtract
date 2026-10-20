@@ -19,15 +19,18 @@ namespace Kopfgeld
 
         readonly Func<string> statsJson;
         readonly Func<string> statusJson;
+        // Where Hunt is (menu, search, match) – for the live search time in the overlay.
+        readonly Func<string> huntJson;
         readonly Func<string, string> overlayJson;
         TcpListener listener;
         CancellationTokenSource cts;
 
         public int Port { get; private set; }
 
-        public OverlayServer(Func<string> statsJson, Func<string> statusJson, Func<string, string> overlayJson)
+        public OverlayServer(Func<string> statsJson, Func<string> statusJson, Func<string> huntJson, Func<string, string> overlayJson)
         {
             this.statsJson = statsJson;
+            this.huntJson = huntJson;
             this.statusJson = statusJson;
             this.overlayJson = overlayJson;
         }
@@ -154,7 +157,7 @@ namespace Kopfgeld
                 case "/api/frame":
                 {
                     // The profile, the values and the language in one answer: the browser source polls only this.
-                    string json = "{\"config\":" + overlayJson(QueryValue(query, "o")) + ",\"stats\":" + statsJson() + ",\"lang\":\"" + Lang.Id + "\"}";
+                    string json = "{\"config\":" + overlayJson(QueryValue(query, "o")) + ",\"stats\":" + statsJson() + ",\"hunt\":" + huntJson() + ",\"lang\":\"" + Lang.Id + "\"}";
                     return Build(200, "application/json; charset=utf-8", Encoding.UTF8.GetBytes(json));
                 }
                 case "/status.json":

@@ -177,6 +177,15 @@ dem Match, und der Name der Karte kommt sicher aus dem Protokoll statt aus der
 Texterkennung. HuntXtract liest nur, ändert nichts und braucht kein Internet. Ohne
 Steam-Installation von Hunt fehlt die Anzeige einfach, der Rest läuft wie gehabt.
 
+Matchsuche: Klickst du in Hunt auf "Bereit", steht oben "Sucht Match · 0:21" mit laufender
+Uhr. Hat Hunt eine Lobby gefunden, folgt "Lobby gefunden · wartet 0:42", bis sie voll ist und
+die Karte lädt. Löst sich die Lobby wieder auf, sucht Hunt weiter und die Uhr läuft weiter.
+Jede Suche, die zu einem Match führt, wird gespeichert (Daten\suchen.json): Suchzeit,
+Lobby-Wartezeit und aufgelöste Lobbys. Die Übersicht zeigt daraus die Karte "Matchsuche":
+Ø Klick bis Match, Ø Suche, Ø Lobby, die längste Wartezeit und die aufgelösten Lobbys –
+heute, für die letzten 10 und insgesamt – und Ø nach Tageszeit (nachts, morgens,
+nachmittags, abends). Abgebrochene Suchen zählen nicht mit.
+
 
 Design
 ------
@@ -204,6 +213,8 @@ die Adresse bleibt gleich. Einstellbar ist:
   Hintergrundbild mit eigener Deckkraft, Farben für Werte, Beschriftung, Akzent,
   Extracted und Died
 - Schrift & Rahmen: fünf Schriften, Rahmenart, Ecken, Schatten und Schriftschatten
+Für die Matchsuche gibt es zwei Werte: "Matchsuche" zeigt live die laufende Suchzeit, dann
+die Wartezeit in der Lobby, und "Ø Klick bis Match" den Durchschnitt im gewählten Zeitraum.
 Mehrere Overlays gleichzeitig sind kein Problem, z. B. eine Leiste für "Heute" und eine
 Karte für das letzte Match. Alte Adressen mit "?scope=…" laufen weiter, übernehmen aber
 keine Änderungen – ersetz sie einmal durch die neue Adresse.

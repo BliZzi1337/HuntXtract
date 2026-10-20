@@ -10,7 +10,7 @@ namespace Kopfgeld
     static class AppInfo
     {
         public const string Name = "HuntXtract";
-        public const string Version = "2.0.0";
+        public const string Version = "2.1.0";
 
         public static string Subtitle
         {
@@ -72,6 +72,8 @@ namespace Kopfgeld
         // The last look at the map that did not count – to see why, when a trail stays short.
         public static string RejectedMapFile { get { return Path.Combine(DataDir, "laufspur-verworfen.jpg"); } }
         public static string MatchesFile { get { return Path.Combine(DataDir, "matches.json"); } }
+        // How long each matchmaking search took (Hunt's log), for the search-time statistics.
+        public static string SearchesFile { get { return Path.Combine(DataDir, "suchen.json"); } }
         public static string DeletedFile { get { return Path.Combine(DataDir, "geloescht.json"); } }
         public static string OverlaysFile { get { return Path.Combine(DataDir, "overlays.json"); } }
         // Pictures from before 1.6.0, all in one folder; they move into MatchesDir on the first start.

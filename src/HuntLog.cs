@@ -198,8 +198,9 @@ namespace Kopfgeld
         }
     }
 
-    // Range: a level without a mission is loaded – the shooting range.
-    enum HuntPhase { None, Menu, Loading, Match, Summary, Range }
+    // Range: a level without a mission is loaded – the shooting range. Searching: matchmaking runs
+    // ("Ready" clicked), Found: it found a lobby, which waits until it is full and the map loads.
+    enum HuntPhase { None, Menu, Loading, Match, Summary, Range, Searching, Found }
 
     // Where Hunt is right now, from its own log.
     sealed class HuntStatus
@@ -208,8 +209,11 @@ namespace Kopfgeld
         // Hunt's name of the level ("civilwar") and the map it is (null for other levels).
         public string Level;
         public string MapName;
-        // UTC: since when in this phase, and when the last match began.
-        public DateTime Since, MatchStarted;
+        // UTC: since when in this phase, when the last match began and when the last search began
+        // (the click on "Ready" – a lobby that breaks up and the search after it count to the same one).
+        public DateTime Since, MatchStarted, SearchStarted;
+        // Lobbies of the running search that broke up again.
+        public int Dissolved;
 
         public HuntStatus Copy()
         {
@@ -223,6 +227,8 @@ namespace Kopfgeld
             d["map"] = MapName;
             d["level"] = Level;
             d["since"] = Since == DateTime.MinValue ? null : Since.ToString("o");
+            d["searchSince"] = SearchStarted == DateTime.MinValue ? null : SearchStarted.ToString("o");
+            d["dissolved"] = Dissolved;
             return d;
         }
     }
@@ -244,6 +250,11 @@ namespace Kopfgeld
         static readonly Regex LevelRx = new Regex(@"PrepareLevel '([^']+)'");
         static readonly Regex BagRx = new Regex(@"CMetaMissionBag state: (\w+)");
         static readonly Regex LoadedRx = new Regex(@"\*LOADING: Level levels/(\w+) loading time");
+        static readonly Regex FoundRx = new Regex(@"CMatchMaking::OnResult err = (\S+)");
+        // A lobby breaking up before its match (not the end of a match: that leaves from eLS_Game).
+        static readonly Regex LobbyLeftRx = new Regex(@"entering state eLS_Leaving\(\d+\) from eLS_(Lobby|PreGame)");
+        // Left a lobby and no new search within that long: it was left by hand, the search is over.
+        const int RequeueSeconds = 20;
 
         readonly object sync = new object();
         readonly object pollLock = new object();
@@ -259,6 +270,13 @@ namespace Kopfgeld
         bool huntRunning;
 
         public event Action<HuntStatus> Changed;
+        // A search led to a match: when it began (UTC, the log's own clock), the seconds until the lobby
+        // that started was found, the seconds that lobby waited until the map loaded, and how many
+        // lobbies broke up before. Also for the searches in the log from before HuntXtract started –
+        // the receiver drops repeats.
+        public event Action<DateTime, int, int, int> SearchFinished;
+        // When a lobby of the running search broke up (MinValue: none pending).
+        DateTime lobbyLeft = DateTime.MinValue;
 
         public HuntStatus Status
         {
@@ -303,6 +321,8 @@ namespace Kopfgeld
                 huntRunning = HuntRuns();
                 if (was && !huntRunning) Set(HuntPhase.None, null, now);
             }
+            // Also while the log stays quiet: a lobby left by hand ends the search.
+            if (!catchingUp) CheckRequeue(now);
             if (path == null || !File.Exists(path))
             {
                 if (now < nextSearch) return;
@@ -358,12 +378,63 @@ namespace Kopfgeld
             if (!time.Success) return;
             // Live, the moment of reading is exact enough; for the past the log's own time (UTC).
             DateTime at = catchingUp ? LogTime(time, now) : now;
+            CheckRequeue(at);
             var level = LevelRx.Match(line);
             if (level.Success)
             {
                 string name = level.Groups[1].Value;
+                HuntStatus before = Status;
                 if (name == "menu") Set(HuntPhase.Menu, null, at);
-                else if (name.StartsWith("levels/", StringComparison.Ordinal)) Set(HuntPhase.Loading, name.Substring(7), at);
+                else if (name.StartsWith("levels/", StringComparison.Ordinal))
+                {
+                    Set(HuntPhase.Loading, name.Substring(7), at);
+                    // The lobby is full, the map loads: the search is complete.
+                    if (before.Phase == HuntPhase.Found && Maps.ContainsKey(name.Substring(7))) SearchDone(before, at, LogTime(time, now));
+                }
+                return;
+            }
+            // Matchmaking: "Request" when the search starts, "OnResult err = 0" when it found a lobby,
+            // "CancelRequest" when it was called off; a lobby that breaks up leaves from eLS_Lobby.
+            if (line.IndexOf("CMatchMaking::Request response", StringComparison.Ordinal) >= 0)
+            {
+                lock (sync)
+                {
+                    bool goesOn = status.Phase == HuntPhase.Found || lobbyLeft != DateTime.MinValue;
+                    if (!goesOn)
+                    {
+                        status.SearchStarted = at;
+                        status.Dissolved = 0;
+                    }
+                    else if (status.Phase == HuntPhase.Found) status.Dissolved++;
+                    lobbyLeft = DateTime.MinValue;
+                }
+                Set(HuntPhase.Searching, null, at);
+                return;
+            }
+            var found = FoundRx.Match(line);
+            if (found.Success)
+            {
+                Set(found.Groups[1].Value == "0" ? HuntPhase.Found : HuntPhase.Menu, null, at);
+                return;
+            }
+            if (line.IndexOf("CMatchMaking::CancelRequest", StringComparison.Ordinal) >= 0)
+            {
+                if (Status.Phase == HuntPhase.Searching) Set(HuntPhase.Menu, null, at);
+                return;
+            }
+            if (LobbyLeftRx.IsMatch(line))
+            {
+                bool wasFound;
+                lock (sync)
+                {
+                    wasFound = status.Phase == HuntPhase.Found;
+                    if (wasFound)
+                    {
+                        status.Dissolved++;
+                        lobbyLeft = at;
+                    }
+                }
+                if (wasFound) Set(HuntPhase.Searching, null, at);
                 return;
             }
             var bag = BagRx.Match(line);
@@ -419,8 +490,34 @@ namespace Kopfgeld
                 case HuntPhase.Match: return "im Match" + (s.MapName != null ? " auf " + s.MapName : "");
                 case HuntPhase.Summary: return "Mission Summary";
                 case HuntPhase.Range: return s.Level == "shooting" ? "auf dem Schießstand" : "im Level " + s.Level;
+                case HuntPhase.Searching: return "sucht ein Match";
+                case HuntPhase.Found: return "Lobby gefunden";
                 default: return "läuft nicht";
             }
+        }
+
+        // A search complete: from the click to the lobby that started, and that lobby's wait.
+        void SearchDone(HuntStatus before, DateTime at, DateTime logAt)
+        {
+            if (before.SearchStarted == DateTime.MinValue) return;
+            int lobby = (int)Math.Round((at - before.Since).TotalSeconds);
+            int total = (int)Math.Round((at - before.SearchStarted).TotalSeconds);
+            if (lobby < 0 || total < lobby) return;
+            var handler = SearchFinished;
+            // The start on the log's own clock (whole seconds): reading the log again later finds the same search.
+            if (handler != null) handler(logAt.AddSeconds(-total), total - lobby, lobby, before.Dissolved);
+        }
+
+        // A lobby broke up and no new search followed: it was left by hand – back in the menu.
+        void CheckRequeue(DateTime at)
+        {
+            bool over;
+            lock (sync)
+            {
+                over = lobbyLeft != DateTime.MinValue && (at - lobbyLeft).TotalSeconds > RequeueSeconds;
+                if (over) lobbyLeft = DateTime.MinValue;
+            }
+            if (over && Status.Phase == HuntPhase.Searching) Set(HuntPhase.Menu, null, at);
         }
 
         static DateTime LogTime(System.Text.RegularExpressions.Match m, DateTime now)

@@ -31,6 +31,8 @@ namespace Kopfgeld
         readonly Panel webHost;
         readonly NotifyIcon tray;
         readonly MatchStore store = new MatchStore();
+        // How long matchmaking took, from Hunt's log.
+        readonly SearchStore searches = new SearchStore();
         readonly OverlayProfiles overlays = new OverlayProfiles();
         readonly OcrService ocr;
         readonly string ocrError;
@@ -84,6 +86,7 @@ namespace Kopfgeld
             tray.DoubleClick += (s, e) => RestoreWindow();
 
             store.Load();
+            searches.Load();
             overlays.Load();
             // New here and Hunt runs in 1920 × 1080: the setup that comes with HuntXtract, ready to use.
             Presets.ApplyOnFirstStart(settings);
@@ -122,6 +125,12 @@ namespace Kopfgeld
             {
                 engine.HuntChanged(hunt);
                 RunOnUi(() => PostEvent("status", StatusPayload(engine.Status)));
+            };
+            huntLog.SearchFinished += (start, seconds, lobby, dissolved) =>
+            {
+                if (!searches.Add(start, seconds, lobby, dissolved)) return;
+                Log.Write("Matchsuche: " + seconds + " s Suche + " + lobby + " s Lobby" + (dissolved > 0 ? ", " + dissolved + " Lobby aufgelöst" : ""));
+                RunOnUi(() => PublishStats(false));
             };
             engine.StatusChanged += st =>
             {
@@ -1077,7 +1086,7 @@ namespace Kopfgeld
 
         void RefreshStats()
         {
-            statsJson = Json.Serialize(Stats.Compute(store.Snapshot(), calibration, settings.DayStartHour));
+            statsJson = Json.Serialize(Stats.Compute(store.Snapshot(), calibration, settings.DayStartHour, searches.Snapshot()));
         }
 
         void PublishStats(bool withMatches)
@@ -1239,7 +1248,7 @@ namespace Kopfgeld
         {
             overlayError = null;
             if (!settings.OverlayEnabled) return;
-            var server = new OverlayServer(() => statsJson, () => statusJson, overlays.ConfigJson);
+            var server = new OverlayServer(() => statsJson, () => statusJson, () => Json.Serialize(huntLog.Status.ToUi()), overlays.ConfigJson);
             string error;
             if (server.Start(settings.OverlayPort, out error))
             {

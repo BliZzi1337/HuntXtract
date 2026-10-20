@@ -19,6 +19,14 @@
     'Ø pro Match': 'Ø per match',
     '{a} von {b}': '{a} of {b}',
     'Keine Werte gewählt': 'No values selected',
+    'Matchsuche': 'Matchmaking',
+    'Ø Suchzeit': 'Ø search time',
+    'Sucht Match …': 'Searching …',
+    'Lobby gefunden': 'Lobby found',
+    'Ø Klick bis Match': 'Ø click to match',
+    'Im Match': 'In a match',
+    '{n} Suchen': '{n} searches',
+    '1 Suche': '1 search',
   };
   let lang = 'de';
   const formats = {};
@@ -143,7 +151,8 @@
     const fields = (stats && stats.fields) || [];
     if (scope === 'last') {
       return [{ key: 'outcome', label: 'Ausgang', hint: 'Extracted/Died' }]
-        .concat(fields.filter((f) => f.type !== 'status').map((f) => ({ key: f.id, label: f.label, hint: f.type === 'text' ? 'Text' : '' })));
+        .concat(fields.filter((f) => f.type !== 'status').map((f) => ({ key: f.id, label: f.label, hint: f.type === 'text' ? 'Text' : '' })))
+        .concat([{ key: 'search', label: 'Matchsuche', hint: 'live' }]);
     }
     const list = [
       { key: 'matches', label: 'Matches', hint: 'Anzahl' },
@@ -154,6 +163,8 @@
     for (const f of fields) if (f.type === 'number') list.push({ key: f.id, label: f.label, hint: '' });
     for (const f of fields) if ((f.type === 'stand' || f.type === 'sterne') && !f.rowMmr) list.push({ key: f.id, label: f.label, hint: 'Stand' });
     if (fields.some((f) => f.rowMmr)) list.push({ key: 'teamMmr', label: 'Team-MMR', hint: 'Ø' });
+    list.push({ key: 'search', label: 'Matchsuche', hint: 'live' });
+    list.push({ key: 'searchAvg', label: 'Ø Suchzeit', hint: 'Ø' });
     return list;
   }
 
@@ -245,6 +256,26 @@
     return value === 'extrahiert' ? 'ok' : value === 'gestorben' ? 'bad' : '';
   }
 
+  // 0:42 or 1:05.
+  function duration(seconds) {
+    if (seconds === null || seconds === undefined) return '–';
+    const s = Math.max(0, Math.round(seconds));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  // The running search (Hunt's log): its clock while it searches, then the lobby's wait.
+  function searchEntry(hunt) {
+    const phase = hunt && hunt.phase;
+    const since = hunt && hunt.searchSince ? new Date(hunt.searchSince).getTime() : 0;
+    if (phase === 'Searching' && since) return { label: L('Matchsuche'), value: duration((Date.now() - since) / 1000), sub: L('Sucht Match …'), live: true };
+    if (phase === 'Found') {
+      const found = hunt.since ? new Date(hunt.since).getTime() : Date.now();
+      return { label: L('Matchsuche'), value: duration((Date.now() - found) / 1000), sub: L('Lobby gefunden'), tone: 'ok', live: true };
+    }
+    if (phase === 'Loading' || phase === 'Match') return { label: L('Matchsuche'), value: L('Im Match') };
+    return { label: L('Matchsuche'), value: '–' };
+  }
+
   function buildItems(stats, o) {
     const fields = (stats && stats.fields) || [];
     const byId = {};
@@ -260,6 +291,8 @@
         let entry = null;
         if (it.key === 'outcome') {
           entry = { label: L('Ausgang'), value: statusText(outcome), tone: toneOf(outcome) };
+        } else if (it.key === 'search') {
+          entry = searchEntry(stats && stats.hunt);
         } else {
           const f = byId[it.key];
           if (!f) continue;
@@ -296,6 +329,13 @@
         entry = { label: 'Extracted', value: formatNumber(agg.extracted), tone: 'ok' };
       } else if (it.key === 'died') {
         entry = { label: 'Died', value: formatNumber(agg.died), tone: 'bad' };
+      } else if (it.key === 'search') {
+        entry = searchEntry(stats && stats.hunt);
+      } else if (it.key === 'searchAvg') {
+        // The whole wait (click to map) where it is known, else the search alone.
+        const s = stats && stats.search && stats.search[o.scope];
+        const known = s && s.avgTotal !== null && s.avgTotal !== undefined;
+        entry = { label: L(known ? 'Ø Klick bis Match' : 'Ø Suchzeit'), value: duration(s ? (known ? s.avgTotal : s.avgSeconds) : null), sub: !s || !s.count ? '' : s.count === 1 ? L('1 Suche') : L('{n} Suchen').replace('{n}', formatNumber(s.count)) };
       } else if (it.key === 'teamMmr') {
         const v = agg.rowMmrAvg;
         entry = { label: L('Team-MMR'), value: v === null || v === undefined ? '–' : formatNumber(v, true) + ' ★', sub: L('Ø aller Zeilen') };
@@ -383,7 +423,8 @@
     if (!items.length) list.appendChild(el('div', 'kg-empty', L('Keine Werte gewählt')));
     for (const item of items) {
       current[item.key] = item.value;
-      const changed = previous[item.key] !== undefined && previous[item.key] !== item.value;
+      // The running search clock changes every second – no flash for that.
+      const changed = !item.live && previous[item.key] !== undefined && previous[item.key] !== item.value;
       const node = el('div', 'kg-item' + (item.tone ? ' kg-' + item.tone : '') + (changed ? ' kg-changed' : ''));
       node.appendChild(el('div', 'kg-label', item.label));
       node.appendChild(el('div', 'kg-value', item.value));
@@ -393,6 +434,7 @@
     root.appendChild(list);
     container.replaceChildren(root);
     container.kgPrevious = current;
+    container.kgLive = items.some((i) => i.live);
     return root;
   }
 
@@ -420,12 +462,13 @@
       try {
         const res = await fetch(url, { cache: 'no-store' });
         const body = await res.text();
-        if (body !== last) {
+        // Drawn again when something changed – and every second while a search clock runs.
+        if (body !== last || target.kgLive) {
           last = body;
           const data = JSON.parse(body);
           setLanguage(data.lang);
           document.documentElement.lang = lang;
-          render(target, data.stats, legacy ? legacyConfig : data.config);
+          render(target, Object.assign({}, data.stats, { hunt: data.hunt || null }), legacy ? legacyConfig : data.config);
         }
       } catch (e) {
         // HuntXtract is not running right now: keep showing the last state.

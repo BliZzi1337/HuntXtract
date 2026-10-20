@@ -75,6 +75,8 @@ const fmt = {
   pct: (v) => (v === null || v === undefined ? '–' : Math.round(v * 100) + ' %'),
   date: (iso) => new Date(iso).toLocaleDateString(localeTag(), { day: '2-digit', month: '2-digit', year: 'numeric' }),
   time: (iso) => new Date(iso).toLocaleTimeString(localeTag(), { hour: '2-digit', minute: '2-digit' }),
+  // Seconds as 0:42 or 1:05.
+  dur: (s) => (s === null || s === undefined ? '–' : Math.floor(s / 60) + ':' + String(Math.round(s) % 60).padStart(2, '0')),
   rel(iso) {
     const s = (Date.now() - new Date(iso).getTime()) / 1000;
     if (s < 60) return t('gerade eben');
@@ -583,9 +585,12 @@ function renderStatus() {
     const minutes = hunt.since ? Math.max(0, Math.floor((Date.now() - new Date(hunt.since).getTime()) / 60000)) : 0;
     // A match cancelled by hand (Hunt's log may still report it after a crash).
     const cancelled = hunt.phase === 'Match' && st.matchCancelled;
-    huntPill.querySelector('.dot').className = 'dot ' + (hunt.phase === 'Match' && !cancelled ? 'ok' : hunt.phase === 'Loading' ? 'busy' : '');
+    huntPill.querySelector('.dot').className = 'dot ' + ((hunt.phase === 'Match' && !cancelled) || hunt.phase === 'Found' ? 'ok'
+      : hunt.phase === 'Loading' || hunt.phase === 'Searching' ? 'busy' : '');
     huntPill.querySelector('.pill-text').textContent =
       cancelled ? tr('Match abgebrochen')
+      : hunt.phase === 'Searching' ? t('Sucht Match · {time}', { time: fmt.dur(searchSeconds(hunt)) })
+      : hunt.phase === 'Found' ? t('Lobby gefunden · wartet {time}', { time: fmt.dur(hunt.since ? (Date.now() - new Date(hunt.since).getTime()) / 1000 : 0) })
       : hunt.phase === 'Match' ? (hunt.map ? t('Im Match · {map} · {n} min', { map: hunt.map, n: minutes }) : t('Im Match · {n} min', { n: minutes }))
         : hunt.phase === 'Loading' ? (hunt.map ? t('Lädt {map} …', { map: hunt.map }) : tr('Lädt …'))
           : hunt.phase === 'Summary' ? 'Mission Summary'
@@ -728,6 +733,8 @@ function renderDashboard() {
   root.append(h('div', { class: 'grid-2' }, lastMatchCard(s.last), last10Card(s.last10, numeric, hasStatus)));
   root.append(chartCard(numeric));
   root.append(mapsCard());
+  const searches = searchCard();
+  if (searches) root.append(searches);
   root.append(allTimeCard(s.all, numeric, hasStatus));
   return root;
 }
@@ -863,6 +870,59 @@ function last10Card(agg, numeric, hasStatus) {
     table.append(h('div', { class: 'k' }, f.label), h('div', { class: 'v' }, fmt.dec(agg.avgs[f.id])), h('div', { class: 'b' }, fmt.int(agg.best[f.id])));
   }
   card.append(table);
+  return card;
+}
+
+// How long the running search has been going (Hunt's log), in seconds.
+function searchSeconds(hunt) {
+  return hunt && hunt.searchSince ? Math.max(0, (Date.now() - new Date(hunt.searchSince).getTime()) / 1000) : 0;
+}
+
+// What the overlay previews draw: the values plus where Hunt is (for the live search time).
+function overlayData() {
+  return Object.assign({}, state.stats, { hunt: (state.status && state.status.hunt) || null });
+}
+
+const DAY_PARTS = { 0: 'Nachts', 6: 'Morgens', 12: 'Nachmittags', 18: 'Abends' };
+
+// How long matchmaking takes: today, overall and by time of day – from Hunt's own log.
+function searchCard() {
+  const s = state.stats && state.stats.search;
+  if (!s || !s.all || !s.all.count) return null;
+  const card = h('div', { class: 'card' }, h('div', { class: 'card-head' }, h('h3', {}, 'Matchsuche'),
+    h('span', { class: 'muted small' }, t(s.all.count === 1 ? '1 Suche erfasst' : '{n} Suchen erfasst', { n: fmt.int(s.all.count) }))));
+  const stat = (value, label, title) => h('div', { class: 'map-stat', title }, h('b', {}, value), h('span', {}, label));
+  // The whole wait first: from the click on "Ready" until the map loads.
+  card.append(h('div', { class: 'search-stats' },
+    stat(fmt.dur(s.all.avgTotal), 'Ø Klick bis Match', tr('Vom Klick auf „Bereit“ bis die Karte lädt')),
+    stat(fmt.dur(s.all.avgSeconds), 'Ø Suche', tr('Bis Hunt eine Lobby gefunden hat')),
+    stat(fmt.dur(s.all.avgLobby), 'Ø Lobby', tr('Von der gefundenen Lobby bis die Karte lädt – warten, bis sie voll ist')),
+    stat(fmt.dur(s.all.longestTotal !== null && s.all.longestTotal !== undefined ? s.all.longestTotal : s.all.longest), 'Längste'),
+    stat(fmt.int(s.all.dissolved), 'Lobbys aufgelöst', tr('Lobbys, die sich vor dem Match wieder aufgelöst haben'))));
+  // Today and the last 10 next to each other.
+  const table = h('div', { class: 'search-table' }, h('div'), h('div', { class: 'h' }, 'Suche'), h('div', { class: 'h' }, 'Lobby'),
+    h('div', { class: 'h' }, 'Gesamt'), h('div', { class: 'h' }, 'Suchen'));
+  for (const [key, label] of [['today', 'Heute'], ['last10', 'Letzte 10'], ['all', 'Insgesamt']]) {
+    const a = s[key];
+    table.append(h('div', { class: 'k' }, label), h('div', {}, fmt.dur(a.avgSeconds)), h('div', {}, fmt.dur(a.avgLobby)),
+      h('div', { class: 'v' }, fmt.dur(a.avgTotal)), h('div', { class: 'n' }, fmt.int(a.count)));
+  }
+  card.append(table);
+  // By time of day (the whole wait): the bar compares with the slowest part of the day.
+  const value = (p) => (p.avgTotal !== null && p.avgTotal !== undefined ? p.avgTotal : p.avgSeconds);
+  const parts = (s.byTime || []).filter((p) => p.count);
+  if (parts.length > 1) {
+    const slowest = Math.max(...parts.map(value));
+    const rows = h('div', { class: 'search-parts' });
+    for (const p of s.byTime) {
+      rows.append(h('div', { class: 'search-part' + (p.count ? '' : ' none') },
+        h('span', { class: 'search-part-name', title: t('{from}–{to} Uhr', { from: p.from, to: p.from + 6 }) }, DAY_PARTS[p.from]),
+        h('div', { class: 'map-bar' }, h('span', { style: { width: p.count ? Math.max(3, (value(p) / slowest) * 100) + '%' : '0' } })),
+        h('span', { class: 'search-part-value' }, p.count ? fmt.dur(value(p)) : '–'),
+        h('span', { class: 'search-part-count' }, p.count ? t(p.count === 1 ? '1 Suche' : '{n} Suchen', { n: p.count }) : '')));
+    }
+    card.append(h('div', { class: 'tier-label', style: { marginTop: '16px' } }, 'Ø Klick bis Match nach Tageszeit'), rows);
+  }
   return card;
 }
 
@@ -2573,7 +2633,7 @@ const overlayView = {
 
   renderPreview() {
     if (!this.refs.inner || !OV()) return;
-    OV().render(this.refs.inner, state.stats, this.current);
+    OV().render(this.refs.inner, overlayData(), this.current);
     requestAnimationFrame(() => this.fit());
   },
 
@@ -2613,7 +2673,7 @@ const overlayView = {
     const items = p.items.map((i) => Object.assign({}, i, { on: i.on && shown++ < 3 }));
     for (const entry of this.refs.presets || []) {
       const cfg = Object.assign({}, p, OV().PRESETS[entry.key], { items, scale: 1, animate: false });
-      OV().render(entry.inner, state.stats, cfg);
+      OV().render(entry.inner, overlayData(), cfg);
       const f = Math.min(1, 186 / Math.max(1, entry.inner.offsetWidth), 70 / Math.max(1, entry.inner.offsetHeight));
       entry.inner.style.transform = 'translate(-50%, -50%) scale(' + f + ')';
       entry.tile.classList.toggle('active', p.preset === entry.key);
@@ -3425,6 +3485,11 @@ async function boot() {
     if (e.key === 'Escape' && modal.isOpen && !hotkeyRecorder.active) modal.close();
   });
 
+  // The search and lobby clock at the top runs on by the second.
+  setInterval(() => {
+    const hunt = state.status && state.status.hunt;
+    if (hunt && (hunt.phase === 'Searching' || hunt.phase === 'Found')) renderStatus();
+  }, 1000);
   api.on('status', (st) => {
     state.status = st;
     renderStatus();

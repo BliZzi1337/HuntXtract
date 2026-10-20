@@ -172,6 +172,15 @@ with the match, and the name of the map comes reliably from the log instead of t
 recognition. HuntXtract only reads, changes nothing and needs no internet. Without a Steam
 installation of Hunt the display is simply missing, the rest works as before.
 
+Matchmaking: when you click "Ready" in Hunt, the top bar shows "Searching · 0:21" with a
+running clock. Once Hunt found a lobby it shows "Lobby found · waiting 0:42" until the lobby
+is full and the map loads. If the lobby breaks up, Hunt searches on and so does the clock.
+Every search that leads to a match is saved (Daten\suchen.json): search time, lobby wait and
+lobbies that broke up. The overview turns that into the "Matchmaking" card: Ø click to
+match, Ø search, Ø lobby, the longest wait and the lobbies broken up – today, for the last
+10 and overall – and Ø by time of day (night, morning, afternoon, evening). Cancelled
+searches don't count.
+
 
 Design
 ------
@@ -200,6 +209,8 @@ second – the address stays the same. You can set:
   background picture with its own opacity, colours for values, labels, accent,
   Extracted and Died
 - Font & frame: five fonts, frame style, corners, shadow and text shadow
+For matchmaking there are two values: "Matchmaking" shows the running search time live, then
+the wait in the lobby, and "Ø click to match" the average for the chosen period.
 Several overlays at once are no problem, e.g. a bar for "Today" and a card for the last
 match. The overlay uses the language of the program. Old addresses with "?scope=…" keep
 working but don't pick up changes – replace them once with the new address.

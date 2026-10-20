@@ -738,7 +738,7 @@ namespace Kopfgeld
 
     static class Stats
     {
-        public static Dictionary<string, object> Compute(List<Match> matches, Calibration calibration, int dayStartHour)
+        public static Dictionary<string, object> Compute(List<Match> matches, Calibration calibration, int dayStartHour, List<SearchRecord> searches)
         {
             var fields = calibration.AllFields;
             var numeric = fields.Where(f => f.Type == "number").ToList();
@@ -772,6 +772,7 @@ namespace Kopfgeld
             d["today"] = Aggregate(today, numeric, levels, rowMmr, status);
             d["last10"] = Aggregate(last10, numeric, levels, rowMmr, status);
             d["all"] = Aggregate(ordered, numeric, levels, rowMmr, status);
+            d["search"] = SearchStore.Compute(searches, dayStart);
             var last = ordered.LastOrDefault();
             d["last"] = last == null ? null : MatchStore.ToUi(last);
             d["updated"] = DateTimeOffset.Now.ToString("o", CultureInfo.InvariantCulture);
